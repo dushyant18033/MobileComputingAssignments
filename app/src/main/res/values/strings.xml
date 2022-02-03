@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">MC Assignment1</string>
+    <string name="name">Enter Name:</string>
+    <string name="button_yes">Yes</string>
+    <string name="button_no">No</string>
+    <string name="button_next">Next</string>
+    <string name="button_submit">Submit</string>
+    <string name="button_clear">Clear</string>
+    <string name="button_check">Check Status</string>
+    <string name="rtpcr_yes">GET RT-PCR IMMEDIATELY!!!</string>
+    <string name="rtpcr_no">NO NEED FOR RT-PCR!</string>
 </resources>
