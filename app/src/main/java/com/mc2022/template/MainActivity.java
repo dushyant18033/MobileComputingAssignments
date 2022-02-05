@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     // other helper variables
     private String[] symptoms;
+    private String previousState = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,50 +144,58 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "clear: the form was reset", Toast.LENGTH_SHORT).show();
         });
 
-        Log.i(TAG, "state: onCreate");
-        Toast.makeText(MainActivity.this, TAG + ", state: onCreate", Toast.LENGTH_SHORT).show();
+        stateLogAndToast("Created");
+    }
+
+    private void stateLogAndToast(String currentState)
+    {
+        String msg = "State of " + TAG + " changed";
+        if (previousState.equals("")) {
+            msg += " to " + currentState;
+        }
+        else {
+            msg += " from " + previousState + " to " + currentState;
+        }
+        previousState = currentState;
+
+        Log.i(TAG, msg);
+        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "state: onStart");
-        Toast.makeText(MainActivity.this, TAG + ", state: onStart", Toast.LENGTH_SHORT).show();
+        stateLogAndToast("Started");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "state: onResume");
-        Toast.makeText(MainActivity.this, TAG + ", state: onResume", Toast.LENGTH_SHORT).show();
+        stateLogAndToast("Resumed");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i(TAG, "state: onPause");
-        Toast.makeText(MainActivity.this, TAG + ", state: onPause", Toast.LENGTH_SHORT).show();
+        stateLogAndToast("Paused");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG, "state: onStop");
-        Toast.makeText(MainActivity.this, TAG + ", state: onStop", Toast.LENGTH_SHORT).show();
+        stateLogAndToast("Stopped");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "state: onDestroy");
-        Toast.makeText(MainActivity.this, TAG + ", state: onDestroy", Toast.LENGTH_SHORT).show();
+        stateLogAndToast("Destroyed");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.i(TAG, "state: onRestart");
-        Toast.makeText(MainActivity.this, TAG + ", state: onRestart", Toast.LENGTH_SHORT).show();
+        stateLogAndToast("Restarted");
     }
 
     @Override
@@ -195,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         // saving state variables
         savedInstanceState.putSerializable("user", user);
         savedInstanceState.putInt("symptomId", symptomId);
-        Log.i(TAG, "state: onSaveInstanceState");
-        Toast.makeText(MainActivity.this, TAG + ", state: onSaveInstanceState", Toast.LENGTH_SHORT).show();
+        Log.i(TAG, "onSaveInstanceState");
+        Toast.makeText(MainActivity.this, TAG + ", onSaveInstanceState", Toast.LENGTH_SHORT).show();
     }
 }
