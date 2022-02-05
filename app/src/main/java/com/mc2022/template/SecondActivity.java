@@ -52,6 +52,8 @@ public class SecondActivity extends AppCompatActivity {
 
         // button to check whether test is needed
         buttonCheck.setOnClickListener(view -> {
+            Log.i(TAG, "check: onclick");
+            Toast.makeText(SecondActivity.this, "check: onclick", Toast.LENGTH_SHORT).show();
             buttonPressed = true;
             textViewStatus.setText( user.isTestNeeded()? R.string.rtpcr_yes:R.string.rtpcr_no);
         });
