@@ -12,30 +12,48 @@ import android.widget.Toast;
 public class SecondActivity extends AppCompatActivity {
 
     private static final String TAG = "SecondActivity";
+
+    // widgets
     private TextView textViewInfo;
     private Button buttonCheck;
     private TextView textViewStatus;
+
+    // state variables
+    private CovidUser user;
+    private boolean buttonPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
+        /* CONTROLLER logic */
+
         textViewInfo = (TextView) findViewById(R.id.textViewInfoFilled);
         buttonCheck = (Button) findViewById(R.id.buttonCheckStatus);
         textViewStatus = (TextView) findViewById(R.id.textViewStatus);
 
-        Intent intent = getIntent();
-        CovidPatient user = (CovidPatient) intent.getSerializableExtra("user");
+        // handling activity restart - restoring the state
+        if (savedInstanceState!=null) {
+            user = (CovidUser) savedInstanceState.getSerializable("user");
+            buttonPressed = savedInstanceState.getBoolean("buttonPressed");
 
+            if (buttonPressed) {
+                textViewStatus.setText(user.isTestNeeded() ? R.string.rtpcr_yes : R.string.rtpcr_no);
+            }
+        }
+        else {
+            Intent intent = getIntent();
+            user = (CovidUser) intent.getSerializableExtra("user");
+        }
+
+        // displaying entered form info
         textViewInfo.setText(user.toString());
 
+        // button to check whether test is needed
         buttonCheck.setOnClickListener(view -> {
-            if (user.isTestNeeded()) {
-                textViewStatus.setText(R.string.rtpcr_yes);
-            } else {
-                textViewStatus.setText(R.string.rtpcr_no);
-            }
+            buttonPressed = true;
+            textViewStatus.setText( user.isTestNeeded()? R.string.rtpcr_yes:R.string.rtpcr_no);
         });
 
         Log.i(TAG, "state: onCreate");
@@ -87,6 +105,9 @@ public class SecondActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
+        // saving state variables
+        savedInstanceState.putSerializable("user", user);
+        savedInstanceState.putBoolean("buttonPressed", buttonPressed);
         Log.i(TAG, "state: onSaveInstanceState");
         Toast.makeText(SecondActivity.this, TAG + ", state: onSaveInstanceState", Toast.LENGTH_SHORT).show();
     }

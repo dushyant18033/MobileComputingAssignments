@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">MC Assignment1</string>
-    <string name="name">Enter Name:</string>
+    <string name="name">Name:</string>
     <string name="button_yes">Yes</string>
     <string name="button_no">No</string>
     <string name="button_next">Next</string>
@@ -9,4 +9,10 @@
     <string name="button_check">Check Status</string>
     <string name="rtpcr_yes">GET RT-PCR IMMEDIATELY!!!</string>
     <string name="rtpcr_no">NO NEED FOR RT-PCR!</string>
+    <string name="symptom1">fever</string>
+    <string name="symptom2">runny nose</string>
+    <string name="symptom3">scratchy throat</string>
+    <string name="symptom4">body ache</string>
+    <string name="symptom5">head ache</string>
+    <string name="symptom6">loss of taste</string>
 </resources>

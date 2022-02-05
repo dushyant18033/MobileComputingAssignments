@@ -1,6 +1,5 @@
 package com.mc2022.template;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,9 +15,14 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "FirstActivity";
-    private int symptomId = 0;
-    private CovidPatient user;
 
+    // state variables
+    private int symptomId = 0;
+
+    // Model instance
+    private CovidUser user;
+
+    // Widgets
     private EditText editTextName;
     private TextView textViewSymptom;
 
@@ -30,19 +34,22 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonSubmit;
     private Button buttonClear;
 
-    private String[] symptoms = new String[]{
-            "fever",
-            "runny nose",
-            "scratchy throat",
-            "body ache",
-            "head ache",
-            "loss of taste"
-    };
+    // other helper variables
+    private String[] symptoms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        symptoms = new String[]{
+            getString(R.string.symptom1),
+            getString(R.string.symptom2),
+            getString(R.string.symptom3),
+            getString(R.string.symptom4),
+            getString(R.string.symptom5),
+            getString(R.string.symptom6),
+        };
 
         editTextName = (EditText) findViewById(R.id.editTextName);
         textViewSymptom = (TextView) findViewById(R.id.textViewSymptom);
@@ -52,15 +59,19 @@ public class MainActivity extends AppCompatActivity {
         buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
         buttonClear = (Button) findViewById(R.id.buttonClear);
 
+        // handling activity restart - restoring the state
         if (savedInstanceState!=null) {
-            user = (CovidPatient) savedInstanceState.getSerializable("user");
+            user = (CovidUser) savedInstanceState.getSerializable("user");
             symptomId = savedInstanceState.getInt("symptomId");
         }
         else {
-            user = new CovidPatient();
+            user = new CovidUser();
             symptomId = 0;
         }
 
+        /* CONTROLLER logic */
+
+        // input name
         editTextName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -75,18 +86,22 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {}
         });
 
+        // display symptom
         textViewSymptom.setText(symptoms[symptomId]);
 
+        // yes button
         buttonYes.setOnClickListener(view -> {
             user.setSymptom((String) textViewSymptom.getText(), true);
             Log.i(TAG, "Yes:"+textViewSymptom.getText().toString());
         });
 
+        // no button
         buttonNo.setOnClickListener(view -> {
             user.setSymptom((String) textViewSymptom.getText(), false);
             Log.i(TAG, "No:"+textViewSymptom.getText().toString());
         });
 
+        // next symptom, only proceeds if answered current one
         buttonNext.setOnClickListener(view -> {
             if (user!=null && user.getSymptoms().containsKey(textViewSymptom.getText())) {
                 if (symptomId < symptoms.length - 1) {
@@ -102,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // submit info and move to second_activity
         buttonSubmit.setOnClickListener(view -> {
             if (user!=null && user.getName()!=null && user.getSymptomsLength()==symptoms.length) {
                 Intent intent = new Intent(MainActivity.this, SecondActivity.class);
@@ -114,8 +130,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // clear or reset the form
         buttonClear.setOnClickListener(view -> {
-            user = new CovidPatient();
+            user = new CovidUser();
             symptomId = 0;
 
             textViewSymptom.setText(symptoms[symptomId]);
@@ -175,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
+        // saving state variables
         savedInstanceState.putSerializable("user", user);
         savedInstanceState.putInt("symptomId", symptomId);
         Log.i(TAG, "state: onSaveInstanceState");

@@ -3,10 +3,19 @@ package com.mc2022.template;
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class CovidPatient implements Serializable {
+/*
+* MODEL CLASS
+*/
+
+public class CovidUser implements Serializable {
+
+    // store the user's name
     private String name;
+
+    // store the user's responses to each symptom (true - yes, false - no)
     private HashMap<String,Boolean> symptoms = new HashMap<String, Boolean>();
 
+    /* Getters and Setters */
     public String getName() {
         return name;
     }
@@ -23,6 +32,7 @@ public class CovidPatient implements Serializable {
         this.symptoms.put(symptom, value);
     }
 
+    /* Helper Methods */
     public int getSymptomsLength() {
         return symptoms.size();
     }
