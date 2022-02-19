@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Latest News</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="start_button">Start Service</string>
+    <string name="stop_button">Stop Service</string>
+    <string name="recent_button">Recent News</string>
+    <string name="prev_button">Previous</string>
+    <string name="next_button">Next</string>
 </resources>

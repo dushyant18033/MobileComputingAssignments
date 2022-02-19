@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mc2022.template">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +12,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
+        <receiver
+            android:name=".PowerConnectReceiver"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
+            android:name=".BatteryLowReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".RecentNewsActivity"
+            android:exported="false" />
+
+        <service
+            android:name=".NewsService"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
