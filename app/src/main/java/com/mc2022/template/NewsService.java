@@ -85,6 +85,12 @@ public class NewsService extends Service {
                 e.printStackTrace();
             }
 
+            if(res.startsWith("<!DOCTYPE"))
+            {
+                Log.i(TAG, "No more news available.");
+                return null;
+            }
+
             try {
                 News news = new News(res);
                 news.saveToFile("" + strings[1], getApplicationContext());
