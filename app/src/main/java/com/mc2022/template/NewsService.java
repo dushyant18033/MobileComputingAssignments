@@ -23,7 +23,7 @@ import java.util.TimerTask;
 public class NewsService extends Service {
 
     private static final String TAG = "NewsService";
-    private static final int PERIOD = 5000;
+    private static final int PERIOD = 10000;
 
     private static Timer timer;
 
@@ -56,7 +56,7 @@ public class NewsService extends Service {
         }
 
         Log.i(TAG, "onStartCommand");
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
