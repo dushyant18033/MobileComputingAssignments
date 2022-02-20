@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +35,8 @@ public class NewsService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        index = intent.getIntExtra("start_index", 0);
+
         Log.d(TAG, "NewsService starting...");
 
         if (timer == null) {
@@ -47,7 +48,7 @@ public class NewsService extends Service {
                     NetworkInfo netInfo = connMng.getActiveNetworkInfo();
                     boolean connected = netInfo.isConnected();
                     if (connected) {
-                        new DownloadTask().execute("https://petwear.in/mc2022/news/news_" + index + ".json");
+                        new DownloadTask().execute("https://petwear.in/mc2022/news/", "news_" + index + ".json");
                         index++;
                     }
                 }
@@ -77,28 +78,20 @@ public class NewsService extends Service {
 
             String res = null;
             try {
-                res = downloadJson(strings[0]);
+                res = downloadJson(strings[0], strings[1]);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            Log.i(TAG, res);
-
             try {
-                JSONObject json = new JSONObject(res);
-
-                String title = json.getString("title");
-                String body = json.getString("body");
-                String image = json.getString("image-url");
-
-                Intent news = new Intent("NewsPublished");
-                news.putExtra("title", title);
-                news.putExtra("body", body);
-                news.putExtra("image", image);
-                sendBroadcast(news);
-            } catch (JSONException e) {
+                News news = new News(res);
+                news.saveToFile("" + strings[1], getApplicationContext());
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
+
+            Intent news = new Intent("NewsPublished");
+            sendBroadcast(news);
             return null;
         }
         protected void onProgressUpdate(Integer... progress) {
@@ -107,11 +100,11 @@ public class NewsService extends Service {
         protected void onPostExecute(Void result) {
         }
 
-        private String downloadJson(String urlString) throws IOException {
+        private String downloadJson(String baseUri, String path) throws IOException {
             InputStream is = null;
             int BUF_SIZE = 1024;
             try {
-                URL url = new URL(urlString);
+                URL url = new URL(baseUri + path);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(10000);
                 conn.setConnectTimeout(15000);

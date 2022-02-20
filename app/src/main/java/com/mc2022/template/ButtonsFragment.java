@@ -1,5 +1,6 @@
 package com.mc2022.template;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,16 +44,18 @@ public class ButtonsFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_buttons, container, false);
 
-        v.findViewById(R.id.buttonPrev).setOnClickListener(new View.OnClickListener() {
+        v.findViewById(R.id.buttonStart).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 Log.i(TAG,"startService");
-                getActivity().startService(new Intent(getActivity(), NewsService.class));
+                Intent intent = new Intent(getActivity(), NewsService.class);
+                intent.putExtra("start_index", countValidFiles(getContext()));
+                getActivity().startService(intent);
             }
         });
 
-        v.findViewById(R.id.buttonNext).setOnClickListener(new View.OnClickListener() {
+        v.findViewById(R.id.buttonStop).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
@@ -71,5 +74,21 @@ public class ButtonsFragment extends Fragment {
         });
 
         return v;
+    }
+
+    private int countValidFiles(Context context)
+    {
+        String[] files = context.fileList();
+
+        int ctr = 0;
+        for (int i=0; i<files.length; i++)
+        {
+            if (files[i].startsWith("news"))
+            {
+                ctr++;
+            }
+        }
+
+        return ctr;
     }
 }

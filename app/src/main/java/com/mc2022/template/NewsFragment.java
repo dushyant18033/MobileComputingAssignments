@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.io.InputStream;
@@ -18,8 +19,6 @@ import java.net.URL;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link NewsFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class NewsFragment extends Fragment {
 
@@ -44,32 +43,13 @@ public class NewsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NewsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NewsFragment newInstance(String param1, String param2, String param3) {
-        NewsFragment fragment = new NewsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_TITLE, param1);
-        args.putString(ARG_BODY, param2);
-        args.putString(ARG_IMAGE, param3);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mTitle = getArguments().getString(ARG_TITLE);
-            mBody = getArguments().getString(ARG_BODY);
-            mImage = getArguments().getString(ARG_IMAGE);
+        if (savedInstanceState != null) {
+            mTitle = savedInstanceState.getString(ARG_TITLE);
+            mBody = savedInstanceState.getString(ARG_BODY);
+            mImage = savedInstanceState.getString(ARG_IMAGE);
         }
     }
 
@@ -86,8 +66,17 @@ public class NewsFragment extends Fragment {
         textViewBody.setText(mBody);
 
         imageView = v.findViewById(R.id.imageView);
+        new ImageDownloadTask(mImage, imageView).execute();
 
         return v;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ARG_TITLE, mTitle);
+        outState.putString(ARG_BODY, mBody);
+        outState.putString(ARG_IMAGE, mImage);
     }
 
     public void setContent(String title, String body, String image) {
@@ -98,15 +87,15 @@ public class NewsFragment extends Fragment {
         textViewTitle.setText(mTitle);
         textViewBody.setText(mBody);
         imageView.setImageResource(R.drawable.ic_launcher_foreground);
-        new ImageLoadTask(mImage, imageView).execute();
+        new ImageDownloadTask(mImage, imageView).execute();
     }
 
-    private class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
+    private class ImageDownloadTask extends AsyncTask<Void, Void, Bitmap> {
 
         private String uri;
         private ImageView imageView;
 
-        public ImageLoadTask(String uri, ImageView imageView) {
+        public ImageDownloadTask(String uri, ImageView imageView) {
             this.uri = uri;
             this.imageView = imageView;
         }
