@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
     private NewsFragment newsFragment;
 
+    private String previousState = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,12 +65,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }, new IntentFilter("NewsPublished"));
 
+        stateLogAndToast("Created");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         refreshLatestNews();
+        stateLogAndToast("Started");
     }
 
     private void refreshLatestNews()
@@ -96,11 +100,64 @@ public class MainActivity extends AppCompatActivity {
     private void broadcastReceivers()
     {
         IntentFilter batteryLow = new IntentFilter();
-        batteryLow.addAction("BATTERY_LOW");
+        batteryLow.addAction("android.intent.action.BATTERY_LOW");
         registerReceiver(new BatteryLowReceiver(), batteryLow);
 
+        IntentFilter batteryOkay = new IntentFilter();
+        batteryOkay.addAction("android.intent.action.BATTERY_OKAY");
+        registerReceiver(new BatteryOkayReceiver(), batteryOkay);
+
         IntentFilter powerConnect = new IntentFilter();
-        batteryLow.addAction("POWER_CONNECTED");
+        powerConnect.addAction("android.intent.action.ACTION_POWER_CONNECTED");
         registerReceiver(new PowerConnectReceiver(), powerConnect);
+
+        IntentFilter powerDisconnect = new IntentFilter();
+        powerDisconnect.addAction("android.intent.action.ACTION_POWER_DISCONNECTED");
+        registerReceiver(new PowerDisconnectReceiver(), powerDisconnect);
     }
+
+    private void stateLogAndToast(String currentState)
+    {
+        String msg = "State of " + TAG + " changed";
+        if (previousState.equals("")) {
+            msg += " to " + currentState;
+        }
+        else {
+            msg += " from " + previousState + " to " + currentState;
+        }
+        previousState = currentState;
+
+        Log.i(TAG, msg);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        stateLogAndToast("Resumed");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stateLogAndToast("Paused");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stateLogAndToast("Stopped");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stateLogAndToast("Destroyed");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        stateLogAndToast("Restarted");
+    }
+
 }

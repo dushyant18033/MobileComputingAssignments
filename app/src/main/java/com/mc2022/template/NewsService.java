@@ -37,7 +37,7 @@ public class NewsService extends Service {
 
         index = intent.getIntExtra("start_index", 0);
 
-        Log.d(TAG, "NewsService starting...");
+        Log.d(TAG, "Service starting...");
 
         if (timer == null) {
             timer = new Timer();
@@ -70,6 +70,8 @@ public class NewsService extends Service {
         super.onDestroy();
         timer.cancel();
         timer = null;
+
+        Log.d(TAG, "Service stopped.");
     }
 
     private class DownloadTask extends AsyncTask<String, Integer, Void> {

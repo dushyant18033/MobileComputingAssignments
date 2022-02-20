@@ -12,5 +12,6 @@ public class PowerConnectReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.i("Receiver", "Power Connected");
         Toast.makeText(context, "Power Connected", Toast.LENGTH_SHORT).show();
+        context.stopService(new Intent(context, NewsService.class));
     }
 }

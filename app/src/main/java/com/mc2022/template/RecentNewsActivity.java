@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -22,6 +23,8 @@ public class RecentNewsActivity extends AppCompatActivity {
     private int idx = 0;
     private int MAX_NEWS = 5;
     private String[] files;
+
+    private String previousState = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,16 @@ public class RecentNewsActivity extends AppCompatActivity {
         }
         newsFragment = (NewsFragment) frag;
 
-        initialize();
+        if (savedInstanceState == null)
+        {
+            initialize();
+        }
+        else
+        {
+            idx = savedInstanceState.getInt("idx");
+            MAX_NEWS = savedInstanceState.getInt("MAX_NEWS");
+            files = savedInstanceState.getStringArray("files");
+        }
 
         findViewById(R.id.buttonPrev).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +76,8 @@ public class RecentNewsActivity extends AppCompatActivity {
                 }
             }
         });
+
+        stateLogAndToast("Created");
     }
 
     @Override
@@ -71,6 +85,16 @@ public class RecentNewsActivity extends AppCompatActivity {
         super.onStart();
         if (idx < MAX_NEWS)
             updateNewsContainer();
+
+        stateLogAndToast("Started");
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("idx", idx);
+        outState.putInt("MAX_NEWS", MAX_NEWS);
+        outState.putStringArray("files", files);
     }
 
     private void initialize()
@@ -103,4 +127,49 @@ public class RecentNewsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    private void stateLogAndToast(String currentState)
+    {
+        String msg = "State of " + TAG + " changed";
+        if (previousState.equals("")) {
+            msg += " to " + currentState;
+        }
+        else {
+            msg += " from " + previousState + " to " + currentState;
+        }
+        previousState = currentState;
+
+        Log.i(TAG, msg);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        stateLogAndToast("Resumed");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stateLogAndToast("Paused");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stateLogAndToast("Stopped");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stateLogAndToast("Destroyed");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        stateLogAndToast("Restarted");
+    }
+
 }

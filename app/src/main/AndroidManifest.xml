@@ -13,6 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <receiver
+            android:name=".PowerDisconnectReceiver"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
+            android:name=".BatteryOkayReceiver"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
             android:name=".PowerConnectReceiver"
             android:enabled="true"
             android:exported="true" />

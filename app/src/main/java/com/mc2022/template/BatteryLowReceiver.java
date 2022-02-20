@@ -12,5 +12,6 @@ public class BatteryLowReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.i("Receiver", "Battery Low");
         Toast.makeText(context, "Battery Low", Toast.LENGTH_SHORT).show();
+        context.stopService(new Intent(context, NewsService.class));
     }
 }
