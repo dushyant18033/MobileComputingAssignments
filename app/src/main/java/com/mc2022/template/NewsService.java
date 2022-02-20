@@ -27,7 +27,7 @@ public class NewsService extends Service {
 
     private static Timer timer;
 
-    private int index = 0;
+    private static int index = 0;
 
     public NewsService() {
     }
@@ -35,7 +35,7 @@ public class NewsService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        index = intent.getIntExtra("start_index", 0);
+        index = countValidFiles(getApplicationContext());
 
         Log.d(TAG, "Service starting...");
 
@@ -49,7 +49,6 @@ public class NewsService extends Service {
                     boolean connected = netInfo.isConnected();
                     if (connected) {
                         new DownloadTask().execute("https://petwear.in/mc2022/news/", "news_" + index + ".json");
-                        index++;
                     }
                 }
             }, 0, PERIOD);
@@ -74,6 +73,22 @@ public class NewsService extends Service {
         Log.d(TAG, "Service stopped.");
     }
 
+    private int countValidFiles(Context context)
+    {
+        String[] files = context.fileList();
+
+        int ctr = 0;
+        for (int i=0; i<files.length; i++)
+        {
+            if (files[i].startsWith("news"))
+            {
+                ctr++;
+            }
+        }
+
+        return ctr;
+    }
+
     private class DownloadTask extends AsyncTask<String, Integer, Void> {
 
         protected Void doInBackground(String... strings) {
@@ -90,6 +105,8 @@ public class NewsService extends Service {
                 Log.i(TAG, "No more news available.");
                 return null;
             }
+
+            index++;
 
             try {
                 News news = new News(res);
