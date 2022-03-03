@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -48,6 +49,8 @@ public class DetailsFragment extends Fragment {
     private EditText commentBox;
     private RatingBar ratingBar;
 
+    private String previousState = "";
+
     public DetailsFragment() {
         // Required empty public constructor
     }
@@ -72,7 +75,11 @@ public class DetailsFragment extends Fragment {
             mImage = savedInstanceState.getString(ARG_IMAGE);
             mComment = savedInstanceState.getString(ARG_COMMENT);
             mRating = savedInstanceState.getFloat(ARG_RATING);
+
+            news = (News) savedInstanceState.getSerializable("news");
+            pos = savedInstanceState.getInt("pos");
         }
+        stateLogs("onCreate");
     }
 
     @Override
@@ -96,6 +103,8 @@ public class DetailsFragment extends Fragment {
         ratingBar = v.findViewById(R.id.ratingBar);
         ratingBar.setRating(mRating);
 
+        stateLogs("onCreateView");
+
         return v;
     }
 
@@ -107,11 +116,34 @@ public class DetailsFragment extends Fragment {
         outState.putString(ARG_IMAGE, mImage);
         outState.putString(ARG_COMMENT, mComment);
         outState.putFloat(ARG_RATING, mRating);
+
+        outState.putSerializable("news", news);
+        outState.putInt("pos", pos);
+    }
+
+    private void stateLogs(String currentState)
+    {
+        String msg = "State of " + TAG + " changed";
+        if (previousState.equals("")) {
+            msg += " to " + currentState;
+        }
+        else {
+            msg += " from " + previousState + " to " + currentState;
+        }
+        previousState = currentState;
+
+        Log.i(TAG, msg);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        stateLogs("onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         mRating = ratingBar.getRating();
         mComment = commentBox.getText().toString();
 
@@ -123,18 +155,33 @@ public class DetailsFragment extends Fragment {
             e.printStackTrace();
         }
         Log.i(TAG, mComment + " " + mRating);
+        Toast.makeText(getContext(), "saved!", Toast.LENGTH_SHORT).show();
+        stateLogs("onStop");
     }
 
-    //    public void setContent(String title, String body, String image) {
-//        mTitle = title;
-//        mBody = body;
-//        mImage = image;
-//
-//        titleTextView.setText(mTitle);
-//        bodyTextView.setText(mBody);
-//        imageView.setImageResource(R.drawable.ic_launcher_foreground);
-//        new ImageDownloadTask(mImage, imageView).execute();
-//    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        stateLogs("onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        stateLogs("onResume");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stateLogs("onDestroy");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        stateLogs("onDestroyView");
+    }
 
     private class ImageDownloadTask extends AsyncTask<Void, Void, Bitmap> {
 

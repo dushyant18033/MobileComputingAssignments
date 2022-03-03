@@ -50,6 +50,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
 
                 DetailsFragment detailsFragment = new DetailsFragment(cur, position); // new DetailsFragment();
 //                detailsFragment.setArguments(bundle);
+
                 FragmentManager fm = ((AppCompatActivity)v.getContext()).getSupportFragmentManager();
                 fm.beginTransaction()
                         .replace(R.id.mainFragmentContainer, detailsFragment)

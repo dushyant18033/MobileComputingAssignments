@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +29,8 @@ public class MainFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
 
+    private String previousState = "";
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -35,13 +38,12 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            Log.i(TAG, String.join(", ", getActivity().fileList()));
-//        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d(TAG, String.join(", ", getActivity().fileList()));
+        }
+
+        stateLogs("onCreate");
     }
 
     @Override
@@ -86,6 +88,8 @@ public class MainFragment extends Fragment {
             }
         }, new IntentFilter("NewsPublished"));
 
+        stateLogs("onCreateView");
+
         return v;
     }
 
@@ -100,5 +104,55 @@ public class MainFragment extends Fragment {
         }
 
         return newsList;
+    }
+
+    private void stateLogs(String currentState)
+    {
+        String msg = "State of " + TAG + " changed";
+        if (previousState.equals("")) {
+            msg += " to " + currentState;
+        }
+        else {
+            msg += " from " + previousState + " to " + currentState;
+        }
+        previousState = currentState;
+
+        Log.i(TAG, msg);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stateLogs("onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stateLogs("onStop");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        stateLogs("onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        stateLogs("onResume");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stateLogs("onDestroy");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        stateLogs("onDestroyView");
     }
 }

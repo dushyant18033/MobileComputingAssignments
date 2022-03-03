@@ -14,23 +14,16 @@ public class ButtonsFragment extends Fragment {
 
     private static final String TAG = "ButtonsFragment";
 
+    private String previousState = "";
+
     public ButtonsFragment() {
         // Required empty public constructor
-    }
-
-    public static ButtonsFragment newInstance(String param1, String param2) {
-        ButtonsFragment fragment = new ButtonsFragment();
-//        Bundle args = new Bundle();
-//        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
+        stateLogs("onCreate");
     }
 
     @Override
@@ -57,6 +50,58 @@ public class ButtonsFragment extends Fragment {
             }
         });
 
+        stateLogs("onCreateView");
+
         return v;
+    }
+
+    private void stateLogs(String currentState)
+    {
+        String msg = "State of " + TAG + " changed";
+        if (previousState.equals("")) {
+            msg += " to " + currentState;
+        }
+        else {
+            msg += " from " + previousState + " to " + currentState;
+        }
+        previousState = currentState;
+
+        Log.i(TAG, msg);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stateLogs("onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stateLogs("onStop");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        stateLogs("onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        stateLogs("onResume");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stateLogs("onDestroy");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        stateLogs("onDestroyView");
     }
 }

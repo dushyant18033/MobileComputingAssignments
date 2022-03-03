@@ -12,9 +12,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 
-public class News
+public class News implements Serializable
 {
     private static final String TAG = "News";
 
@@ -69,7 +70,7 @@ public class News
         imageUrl = json.getString("image-url");
 
         if (json.isNull("comment")) {
-            comment = "No comment!";
+            comment = "<!-- comments here -->";
         } else {
             comment = json.getString("comment");
         }

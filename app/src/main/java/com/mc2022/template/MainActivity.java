@@ -11,6 +11,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private String previousState = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,5 +39,57 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.mainFragmentContainer, fragment)
                     .commit();
         }
+
+        stateLogs("onCreate");
+    }
+
+    private void stateLogs(String currentState)
+    {
+        String msg = "State of " + TAG + " changed";
+        if (previousState.equals("")) {
+            msg += " to " + currentState;
+        }
+        else {
+            msg += " from " + previousState + " to " + currentState;
+        }
+        previousState = currentState;
+
+        Log.i(TAG, msg);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        stateLogs("onStart");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stateLogs("onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stateLogs("onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stateLogs("onDestroy");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        stateLogs("onRestart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        stateLogs("onResume");
     }
 }
