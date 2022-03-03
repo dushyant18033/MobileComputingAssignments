@@ -1,4 +1,4 @@
-# assignment-0-dushyant18033 - News Application Extension
+# assignment-3-dushyant18033 - News Application Extension
 
 **Summary** :
 A news application that lists news and shows details of the news. This assignment builds upon
