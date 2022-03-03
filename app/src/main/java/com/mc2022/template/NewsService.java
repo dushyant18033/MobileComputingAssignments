@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -38,6 +39,7 @@ public class NewsService extends Service {
         index = countValidFiles(getApplicationContext());
 
         Log.d(TAG, "Service starting...");
+        Toast.makeText(getApplicationContext(), "Service Started!", Toast.LENGTH_SHORT).show();
 
         if (timer == null) {
             timer = new Timer();
@@ -71,6 +73,7 @@ public class NewsService extends Service {
         timer = null;
 
         Log.d(TAG, "Service stopped.");
+        Toast.makeText(getApplicationContext(), "Service Stopped!", Toast.LENGTH_SHORT).show();
     }
 
     private int countValidFiles(Context context)
