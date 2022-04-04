@@ -14,15 +14,15 @@ public class GpsData {
     public String name;
 
     @ColumnInfo(name = "latitude")
-    public float latitude;
+    public double latitude;
 
     @ColumnInfo(name = "longitude")
-    public float longitude;
+    public double longitude;
 
     @ColumnInfo(name = "address")
     public String address;
 
-    public GpsData(String name, float latitude, float longitude, String address) {
+    public GpsData(String name, double latitude, double longitude, String address) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -31,12 +31,10 @@ public class GpsData {
 
     @Override
     public String toString() {
-        return "GpsData{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", address='" + address + '\'' +
-                '}';
+        return id + ": " +
+            latitude + "N; " +
+            longitude + "E\n" +
+            name + "\n" +
+            address;
     }
 }

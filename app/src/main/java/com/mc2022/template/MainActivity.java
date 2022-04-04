@@ -1,15 +1,14 @@
 package com.mc2022.template;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.room.Room;
-
-import com.mc2022.template.SensorDataModels.AccelData;
-import com.mc2022.template.SensorDataModels.AppDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+
 //        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 //        List<Sensor> deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
 //        for(Sensor sensor : deviceSensors)
@@ -42,17 +45,17 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
 
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "sensor-data-db")
-                .allowMainThreadQueries()
-                .build();
+//        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+//                AppDatabase.class, "sensor-data-db")
+//                .allowMainThreadQueries()
+//                .build();
 
-        SensorDataDao dao = db.sensorDataDao();
-        Log.i(TAG, "accel");
-        for(AccelData a : dao.getAcc())
-        {
-            Log.i(TAG, a.toString());
-        }
+//        SensorDataDao dao = db.sensorDataDao();
+//        Log.i(TAG, "accel");
+//        for(AccelData a : dao.getAcc())
+//        {
+//            Log.i(TAG, a.toString());
+//        }
 
         stateLogAndToast("Created");
     }

@@ -6,6 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.mc2022.template.SensorDataModels.AccelData;
+import com.mc2022.template.SensorDataModels.GpsData;
 import com.mc2022.template.SensorDataModels.GyroData;
 import com.mc2022.template.SensorDataModels.LightData;
 import com.mc2022.template.SensorDataModels.OrientationData;
@@ -16,6 +17,20 @@ import java.util.List;
 
 @Dao
 public interface SensorDataDao {
+
+    @Query("SELECT * FROM GpsData G ORDER BY (ABS(G.latitude - :latitude) + ABS(G.longitude - :longitude)) ASC")
+    List<GpsData> getGpsData(double latitude, double longitude);
+
+    @Query("SELECT * FROM GpsData")
+    List<GpsData> getAllGps();
+
+    @Insert
+    void insertGps(GpsData gpsData);
+
+    @Delete
+    void deleteGps(GpsData gpsData);
+
+
 
     @Query("SELECT * FROM AccelData ORDER BY timestamp DESC LIMIT 10")
     List<AccelData> getAcc();

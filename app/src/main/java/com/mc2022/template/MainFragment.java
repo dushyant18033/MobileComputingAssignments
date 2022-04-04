@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,6 +68,8 @@ public class MainFragment extends Fragment {
 
     private TextView textViewAcc;
 
+    private Button gpsButton;
+
 
     public MainFragment() {
         // Required empty public constructor
@@ -115,6 +118,18 @@ public class MainFragment extends Fragment {
         restoreToggleUiState(); // though happens automatically
 
         textViewAcc = v.findViewById(R.id.textViewAcc);
+
+        gpsButton = v.findViewById(R.id.buttonGps);
+        gpsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_fragment_container, new LocationFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
 
         return v;
     }
