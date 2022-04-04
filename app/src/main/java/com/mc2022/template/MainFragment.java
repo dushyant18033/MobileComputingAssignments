@@ -19,6 +19,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
@@ -150,6 +151,32 @@ public class MainFragment extends Fragment {
 
         plotAcc();
         plotProx();
+
+        ToggleButton btnTheme = v.findViewById(R.id.btnTheme);
+
+        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                btnTheme.setChecked(true);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                btnTheme.setChecked(false);
+                break;
+        }
+
+        btnTheme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b)
+                {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                }
+                else
+                {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
+            }
+        });
 
         return v;
     }
