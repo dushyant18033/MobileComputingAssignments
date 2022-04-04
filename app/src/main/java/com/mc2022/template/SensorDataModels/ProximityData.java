@@ -12,12 +12,12 @@ public class ProximityData {
     public int id;
 
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    public String timestamp;
+    public long timestamp;
 
     @ColumnInfo(name = "proximity")
     public float proximity;
 
-    public ProximityData(String timestamp, float proximity) {
+    public ProximityData(long timestamp, float proximity) {
         this.timestamp = timestamp;
         this.proximity = proximity;
     }

@@ -15,6 +15,15 @@
             android:gravity="center"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:gravity="center"
+                android:text="Sensor Toggle Buttons"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -133,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:gravity="center"
-                android:text="Accelerometer"
+                android:text="Accelerometer Status"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -143,6 +152,25 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Location Services" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:gravity="center"
+                android:text="Graphs"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chartAcc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chartProx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>

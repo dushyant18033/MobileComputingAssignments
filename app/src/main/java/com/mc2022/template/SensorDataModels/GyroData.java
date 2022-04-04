@@ -11,7 +11,7 @@ public class GyroData {
     public int id;
 
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    public String timestamp;
+    public long timestamp;
 
     @ColumnInfo(name = "x")
     public float x;
@@ -22,7 +22,7 @@ public class GyroData {
     @ColumnInfo(name = "z")
     public float z;
 
-    public GyroData(String timestamp, float x, float y, float z) {
+    public GyroData(long timestamp, float x, float y, float z) {
         this.timestamp = timestamp;
         this.x = x;
         this.y = y;

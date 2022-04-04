@@ -12,12 +12,12 @@ public class LightData {
     public int id;
 
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    public String timestamp;
+    public long timestamp;
 
     @ColumnInfo(name = "light")
     public float light;
 
-    public LightData(String timestamp, float light) {
+    public LightData(long timestamp, float light) {
         this.timestamp = timestamp;
         this.light = light;
     }

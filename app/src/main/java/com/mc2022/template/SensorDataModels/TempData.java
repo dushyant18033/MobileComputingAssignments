@@ -12,12 +12,12 @@ public class TempData {
     public int id;
 
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    public String timestamp;
+    public long timestamp;
 
     @ColumnInfo(name = "temperature")
     public float temperature;
 
-    public TempData(String timestamp, float temperature) {
+    public TempData(long timestamp, float temperature) {
         this.timestamp = timestamp;
         this.temperature = temperature;
     }

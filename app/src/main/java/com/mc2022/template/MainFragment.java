@@ -308,7 +308,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
 
-                dao.insertAcc(new AccelData(String.valueOf(System.currentTimeMillis()), sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
+                dao.insertAcc(new AccelData(sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
 
                 float avg_acc = (sensorEvent.values[0] + sensorEvent.values[1] + sensorEvent.values[2])/3;
                 textViewAcc.setText("Avg Acc = " + avg_acc + "\r\nDevice " + ((Math.abs(avg_acc)>=0.2)?"Not Stationary":"Stationary"));
@@ -334,7 +334,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
 
-                dao.insertGyro(new GyroData(String.valueOf(System.currentTimeMillis()), sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
+                dao.insertGyro(new GyroData(sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
 
                 Log.i(TAG, "# of values:"+sensorEvent.values.length);
                 for(float value : sensorEvent.values)
@@ -357,7 +357,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
 
-                dao.insertTemp(new TempData(String.valueOf(System.currentTimeMillis()), sensorEvent.values[0]));
+                dao.insertTemp(new TempData(sensorEvent.timestamp, sensorEvent.values[0]));
 
                 Log.i(TAG, "# of values:"+sensorEvent.values.length);
                 for(float value : sensorEvent.values)
@@ -380,7 +380,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
 
-                dao.insertLight(new LightData(String.valueOf(System.currentTimeMillis()), sensorEvent.values[0]));
+                dao.insertLight(new LightData(sensorEvent.timestamp, sensorEvent.values[0]));
 
                 Log.i(TAG, "# of values:"+sensorEvent.values.length);
                 for(float value : sensorEvent.values)
@@ -403,7 +403,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
 
-                dao.insertProximity(new ProximityData(String.valueOf(System.currentTimeMillis()), sensorEvent.values[0]));
+                dao.insertProximity(new ProximityData(sensorEvent.timestamp, sensorEvent.values[0]));
 
                 Log.i(TAG, "# of values:"+sensorEvent.values.length);
                 for(float value : sensorEvent.values)
@@ -426,7 +426,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
 
-                dao.insertOrientation(new OrientationData(String.valueOf(System.currentTimeMillis()), sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
+                dao.insertOrientation(new OrientationData(sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
 
                 Log.i(TAG, "# of values:"+sensorEvent.values.length);
                 for(float value : sensorEvent.values)

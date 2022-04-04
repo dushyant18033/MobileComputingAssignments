@@ -12,7 +12,7 @@ public class OrientationData {
     public int id;
 
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    public String timestamp;
+    public long timestamp;
 
     @ColumnInfo(name = "x")
     public float x;
@@ -23,7 +23,7 @@ public class OrientationData {
     @ColumnInfo(name = "z")
     public float z;
 
-    public OrientationData(String timestamp, float x, float y, float z) {
+    public OrientationData(long timestamp, float x, float y, float z) {
         this.timestamp = timestamp;
         this.x = x;
         this.y = y;
