@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">SensorDB</string>
+    <string name="acc_button">Accelerometer</string>
+    <string name="gyro_button">Gyroscope</string>
+    <string name="temp_button">Temperature</string>
+    <string name="light_button">Light</string>
+    <string name="proximity_button">Proximity</string>
+    <string name="orientation_button">Orientation</string>
 </resources>

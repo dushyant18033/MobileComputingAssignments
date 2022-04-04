@@ -4,6 +4,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.room.Room;
+
+import com.mc2022.template.SensorDataModels.AccelData;
+import com.mc2022.template.SensorDataModels.AppDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,6 +21,38 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FragmentManager fm = getSupportFragmentManager();
+
+        Fragment frag = fm.findFragmentById(R.id.main_fragment_container);
+
+        if (frag == null) {
+            Log.i(TAG, "buttons fragment is null");
+            frag = new MainFragment();
+            fm.beginTransaction()
+                    .add(R.id.main_fragment_container, frag)
+                    .commit();
+        }
+
+//        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+//        List<Sensor> deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
+//        for(Sensor sensor : deviceSensors)
+//        {
+//            Log.i(TAG, sensor.getName() + " " + sensor.getStringType());
+//        }
+
+
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "sensor-data-db")
+                .allowMainThreadQueries()
+                .build();
+
+        SensorDataDao dao = db.sensorDataDao();
+        Log.i(TAG, "accel");
+        for(AccelData a : dao.getAcc())
+        {
+            Log.i(TAG, a.toString());
+        }
 
         stateLogAndToast("Created");
     }
