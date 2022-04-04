@@ -1,6 +1,7 @@
 package com.mc2022.template;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -174,6 +175,21 @@ public class MainFragment extends Fragment {
         chartProx.setScaleEnabled(true);
         chartProx.getDescription().setEnabled(false);
 
+        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                chartProx.getXAxis().setTextColor(Color.WHITE);
+                chartProx.getAxisRight().setTextColor(Color.WHITE);
+                chartProx.getLegend().setTextColor(Color.WHITE);
+                dataSet.setValueTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                chartProx.getXAxis().setTextColor(Color.BLACK);
+                chartProx.getAxisRight().setTextColor(Color.BLACK);
+                chartProx.getLegend().setTextColor(Color.BLACK);
+                dataSet.setValueTextColor(Color.BLACK);
+                break;
+        }
+
         chartProx.invalidate(); // refresh
     }
 
@@ -216,6 +232,25 @@ public class MainFragment extends Fragment {
         chartAcc.setDragEnabled(true);
         chartAcc.setScaleEnabled(true);
         chartAcc.getDescription().setEnabled(false);
+
+        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                chartAcc.getXAxis().setTextColor(Color.WHITE);
+                chartAcc.getAxisRight().setTextColor(Color.WHITE);
+                chartAcc.getLegend().setTextColor(Color.WHITE);
+                dataSet1.setValueTextColor(Color.WHITE);
+                dataSet2.setValueTextColor(Color.WHITE);
+                dataSet3.setValueTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                chartAcc.getXAxis().setTextColor(Color.BLACK);
+                chartAcc.getAxisRight().setTextColor(Color.BLACK);
+                chartAcc.getLegend().setTextColor(Color.BLACK);
+                dataSet1.setValueTextColor(Color.BLACK);
+                dataSet2.setValueTextColor(Color.BLACK);
+                dataSet3.setValueTextColor(Color.BLACK);
+                break;
+        }
 
         chartAcc.invalidate(); // refresh
     }
