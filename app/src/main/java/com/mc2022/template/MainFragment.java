@@ -152,32 +152,6 @@ public class MainFragment extends Fragment {
         plotAcc();
         plotProx();
 
-        ToggleButton btnTheme = v.findViewById(R.id.btnTheme);
-
-        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
-            case Configuration.UI_MODE_NIGHT_YES:
-                btnTheme.setChecked(true);
-                break;
-            case Configuration.UI_MODE_NIGHT_NO:
-                btnTheme.setChecked(false);
-                break;
-        }
-
-        btnTheme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b)
-                {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                }
-                else
-                {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                }
-            }
-        });
-
         return v;
     }
 
@@ -531,6 +505,17 @@ public class MainFragment extends Fragment {
             public void onSensorChanged(SensorEvent sensorEvent) {
 
                 dao.insertLight(new LightData(sensorEvent.timestamp, sensorEvent.values[0]));
+
+                float threshold = 10.0f;
+
+                if (sensorEvent.values[0] <= threshold)
+                {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                }
+                else
+                {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
 
                 Log.i(TAG, "# of values:"+sensorEvent.values.length);
                 for(float value : sensorEvent.values)

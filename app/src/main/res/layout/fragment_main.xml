@@ -15,14 +15,6 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ToggleButton
-                android:id="@+id/btnTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="THEME"
-                android:textOff="LIGHT"
-                android:textOn="DARK" />
-
             <Button
                 android:id="@+id/buttonGps"
                 android:layout_width="wrap_content"
