@@ -1,6 +1,7 @@
 package com.mc2022.template;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,6 +21,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.mc2022.template.SensorDataModels.AccelData;
 import com.mc2022.template.SensorDataModels.AppDatabase;
 import com.mc2022.template.SensorDataModels.GyroData;
@@ -27,6 +33,9 @@ import com.mc2022.template.SensorDataModels.LightData;
 import com.mc2022.template.SensorDataModels.OrientationData;
 import com.mc2022.template.SensorDataModels.ProximityData;
 import com.mc2022.template.SensorDataModels.TempData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainFragment extends Fragment {
@@ -69,6 +78,9 @@ public class MainFragment extends Fragment {
     private TextView textViewAcc;
 
     private Button gpsButton;
+
+    private LineChart chartAcc;
+    private LineChart chartProx;
 
 
     public MainFragment() {
@@ -118,6 +130,7 @@ public class MainFragment extends Fragment {
         restoreToggleUiState(); // though happens automatically
 
         textViewAcc = v.findViewById(R.id.textViewAcc);
+        textViewAcc.setText("Enable ACC to begin...");
 
         gpsButton = v.findViewById(R.id.buttonGps);
         gpsButton.setOnClickListener(new View.OnClickListener() {
@@ -131,7 +144,80 @@ public class MainFragment extends Fragment {
             }
         });
 
+        chartAcc = (LineChart) v.findViewById(R.id.chartAcc);
+        chartProx = (LineChart) v.findViewById(R.id.chartProx);
+
+        plotAcc();
+        plotProx();
+
         return v;
+    }
+
+    private void plotProx()
+    {
+        List<Entry> entries = new ArrayList<Entry>();
+
+        List<ProximityData> data = dao.getProximity();
+
+        for(int i=0; i<data.size(); i++) {
+            entries.add( new Entry(i, data.get(i).proximity) );
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "proximity"); // add entries to dataset
+        dataSet.setLineWidth(2f);
+        dataSet.setValueTextSize(10f);
+        dataSet.setColor(Color.RED);
+
+        LineData lineData = new LineData(dataSet);
+        chartProx.setData(lineData);
+        chartProx.setDragEnabled(true);
+        chartProx.setScaleEnabled(true);
+        chartProx.getDescription().setEnabled(false);
+
+        chartProx.invalidate(); // refresh
+    }
+
+    private void plotAcc()
+    {
+        List<AccelData> data = dao.getAcc();
+
+        List<Entry> entries_x = new ArrayList<Entry>();
+        List<Entry> entries_y = new ArrayList<Entry>();
+        List<Entry> entries_z = new ArrayList<Entry>();
+
+        for(int i=0; i<data.size(); i++) {
+            entries_x.add( new Entry(i, data.get(i).x) );
+            entries_y.add( new Entry(i, data.get(i).y) );
+            entries_z.add( new Entry(i, data.get(i).z) );
+        }
+
+        LineDataSet dataSet1 = new LineDataSet(entries_x, "acc_x");
+        dataSet1.setLineWidth(2f);
+        dataSet1.setValueTextSize(10f);
+        dataSet1.setColor(Color.RED);
+
+        LineDataSet dataSet2 = new LineDataSet(entries_y, "acc_y");
+        dataSet2.setLineWidth(2f);
+        dataSet2.setValueTextSize(10f);
+        dataSet2.setColor(Color.BLUE);
+
+        LineDataSet dataSet3 = new LineDataSet(entries_z, "acc_z");
+        dataSet3.setLineWidth(2f);
+        dataSet3.setValueTextSize(10f);
+        dataSet3.setColor(Color.GREEN);
+
+        ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+        dataSets.add(dataSet1);
+        dataSets.add(dataSet2);
+        dataSets.add(dataSet3);
+
+        LineData lineData = new LineData(dataSets);
+        chartAcc.setData(lineData);
+        chartAcc.setDragEnabled(true);
+        chartAcc.setScaleEnabled(true);
+        chartAcc.getDescription().setEnabled(false);
+
+        chartAcc.invalidate(); // refresh
     }
 
     @Override
@@ -318,6 +404,8 @@ public class MainFragment extends Fragment {
                 {
                     Log.i(TAG, "acc: " + String.valueOf(value));
                 }
+
+                plotAcc();
             }
 
             @Override
@@ -410,6 +498,8 @@ public class MainFragment extends Fragment {
                 {
                     Log.i(TAG, "proximity: " + String.valueOf(value));
                 }
+
+                plotProx();
             }
 
             @Override

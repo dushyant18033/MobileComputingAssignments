@@ -15,6 +15,13 @@
             android:gravity="center"
             android:orientation="vertical">
 
+            <Button
+                android:id="@+id/buttonGps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Location Services" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -146,31 +153,55 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/buttonGps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Location Services" />
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/btnPlotAcc"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_margin="8dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Plot Acceleration" />-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/btnPlotProx"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_margin="8dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Plot Proximity" />-->
+<!--            </LinearLayout>-->
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:gravity="center"
-                android:text="Graphs"
+                android:text="Linear Acceleration Graphs"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/chartAcc"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="300dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:gravity="center"
+                android:text="Proximity Graphs"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/chartProx"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="300dp" />
 
         </LinearLayout>
     </ScrollView>
