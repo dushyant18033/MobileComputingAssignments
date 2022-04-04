@@ -3,6 +3,7 @@ package com.mc2022.template;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,6 +26,7 @@ import androidx.room.Room;
 import com.mc2022.template.SensorDataModels.AppDatabase;
 import com.mc2022.template.SensorDataModels.GpsData;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -165,6 +167,14 @@ public class LocationFragment extends Fragment {
             public void onLocationChanged(@NonNull Location location) {
                 mLatitude = location.getLatitude();
                 mLongitude = location.getLongitude();
+
+                Geocoder geocoder = new Geocoder(getContext());
+                try {
+                    String addr = geocoder.getFromLocation(mLatitude, mLongitude, 1).get(0).getAddressLine(0);
+                    editAddress.setText(addr);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 Log.d(TAG, location.getLatitude() + " " + location.getLongitude());
 
