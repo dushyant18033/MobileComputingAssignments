@@ -159,8 +159,8 @@ public class MainFragment extends Fragment {
 
         List<ProximityData> data = dao.getProximity();
 
-        for(int i=0; i<data.size(); i++) {
-            entries.add( new Entry(i, data.get(i).proximity) );
+        for(int i=data.size() - 1; i>=0; i--) {
+            entries.add( new Entry(data.size() - i - 1, data.get(i).proximity) );
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "proximity"); // add entries to dataset
@@ -185,10 +185,10 @@ public class MainFragment extends Fragment {
         List<Entry> entries_y = new ArrayList<Entry>();
         List<Entry> entries_z = new ArrayList<Entry>();
 
-        for(int i=0; i<data.size(); i++) {
-            entries_x.add( new Entry(i, data.get(i).x) );
-            entries_y.add( new Entry(i, data.get(i).y) );
-            entries_z.add( new Entry(i, data.get(i).z) );
+        for(int i=data.size()-1; i>=0; i--) {
+            entries_x.add( new Entry(data.size() - i - 1, data.get(i).x) );
+            entries_y.add( new Entry(data.size() - i - 1, data.get(i).y) );
+            entries_z.add( new Entry(data.size() - i - 1, data.get(i).z) );
         }
 
         LineDataSet dataSet1 = new LineDataSet(entries_x, "acc_x");
