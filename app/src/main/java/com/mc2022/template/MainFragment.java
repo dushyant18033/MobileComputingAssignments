@@ -81,7 +81,8 @@ public class MainFragment extends Fragment {
 
     private Button gpsButton;
 
-    private ToggleButton gesturesButton;
+    private ToggleButton waveGestureButton;
+    private ToggleButton upDownGestureButton;
 
     private LineChart chartAcc;
     private LineChart chartProx;
@@ -148,7 +149,8 @@ public class MainFragment extends Fragment {
             }
         });
 
-        gesturesButton = v.findViewById(R.id.toggleGestures);
+        waveGestureButton = v.findViewById(R.id.toggleGestureWave);
+        upDownGestureButton = v.findViewById(R.id.toggleGestureUpDown);
 
         chartAcc = (LineChart) v.findViewById(R.id.chartAcc);
         chartProx = (LineChart) v.findViewById(R.id.chartProx);
@@ -205,11 +207,14 @@ public class MainFragment extends Fragment {
         List<Entry> entries_x = new ArrayList<Entry>();
         List<Entry> entries_y = new ArrayList<Entry>();
         List<Entry> entries_z = new ArrayList<Entry>();
+        List<Entry> entries_avg = new ArrayList<Entry>();
 
         for(int i=data.size()-1; i>=0; i--) {
             entries_x.add( new Entry(data.size() - i - 1, data.get(i).x) );
             entries_y.add( new Entry(data.size() - i - 1, data.get(i).y) );
             entries_z.add( new Entry(data.size() - i - 1, data.get(i).z) );
+            float avg = (data.get(i).x + data.get(i).y + data.get(i).z)/3;
+            entries_avg.add( new Entry(data.size() - i - 1, avg) );
         }
 
         LineDataSet dataSet1 = new LineDataSet(entries_x, "acc_x");
@@ -227,10 +232,16 @@ public class MainFragment extends Fragment {
         dataSet3.setValueTextSize(10f);
         dataSet3.setColor(Color.GREEN);
 
+        LineDataSet dataSet4 = new LineDataSet(entries_z, "acc_avg");
+        dataSet3.setLineWidth(2f);
+        dataSet3.setValueTextSize(10f);
+        dataSet3.setColor(Color.YELLOW);
+
         ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
         dataSets.add(dataSet1);
         dataSets.add(dataSet2);
         dataSets.add(dataSet3);
+        dataSets.add(dataSet4);
 
         LineData lineData = new LineData(dataSets);
         chartAcc.setData(lineData);
@@ -246,6 +257,7 @@ public class MainFragment extends Fragment {
                 dataSet1.setValueTextColor(Color.WHITE);
                 dataSet2.setValueTextColor(Color.WHITE);
                 dataSet3.setValueTextColor(Color.WHITE);
+                dataSet4.setValueTextColor(Color.WHITE);
                 break;
             case Configuration.UI_MODE_NIGHT_NO:
                 chartAcc.getXAxis().setTextColor(Color.BLACK);
@@ -254,6 +266,7 @@ public class MainFragment extends Fragment {
                 dataSet1.setValueTextColor(Color.BLACK);
                 dataSet2.setValueTextColor(Color.BLACK);
                 dataSet3.setValueTextColor(Color.BLACK);
+                dataSet4.setValueTextColor(Color.BLACK);
                 break;
         }
 
@@ -439,11 +452,7 @@ public class MainFragment extends Fragment {
                 float avg_acc = (sensorEvent.values[0] + sensorEvent.values[1] + sensorEvent.values[2])/3;
                 textViewAcc.setText("Avg Acc = " + avg_acc + "\r\nDevice " + ((Math.abs(avg_acc)>=0.2)?"Not Stationary":"Stationary"));
 
-                Log.i(TAG, "# of values:"+sensorEvent.values.length);
-                for(float value : sensorEvent.values)
-                {
-                    Log.i(TAG, "acc: " + String.valueOf(value));
-                }
+                Log.i(TAG, "acc: " + sensorEvent.values[0] + " " + sensorEvent.values[1] + " " + sensorEvent.values[2]);
 
                 plotAcc();
             }
@@ -463,12 +472,8 @@ public class MainFragment extends Fragment {
             public void onSensorChanged(SensorEvent sensorEvent) {
 
                 dao.insertGyro(new GyroData(sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
+                Log.i(TAG, "gyro: " + sensorEvent.values[0] + " " + sensorEvent.values[1] + " " + sensorEvent.values[2]);
 
-                Log.i(TAG, "# of values:"+sensorEvent.values.length);
-                for(float value : sensorEvent.values)
-                {
-                    Log.i(TAG, "gyro: " + String.valueOf(value));
-                }
             }
 
             @Override
@@ -486,12 +491,8 @@ public class MainFragment extends Fragment {
             public void onSensorChanged(SensorEvent sensorEvent) {
 
                 dao.insertTemp(new TempData(sensorEvent.timestamp, sensorEvent.values[0]));
+                Log.i(TAG, "temp: " + sensorEvent.values[0]);
 
-                Log.i(TAG, "# of values:"+sensorEvent.values.length);
-                for(float value : sensorEvent.values)
-                {
-                    Log.i(TAG, "temp: " + String.valueOf(value));
-                }
             }
 
             @Override
@@ -521,11 +522,7 @@ public class MainFragment extends Fragment {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 }
 
-                Log.i(TAG, "# of values:"+sensorEvent.values.length);
-                for(float value : sensorEvent.values)
-                {
-                    Log.i(TAG, "light: " + String.valueOf(value));
-                }
+                Log.i(TAG, "light: " + sensorEvent.values[0]);
             }
 
             @Override
@@ -544,26 +541,21 @@ public class MainFragment extends Fragment {
 
                 dao.insertProximity(new ProximityData(sensorEvent.timestamp, sensorEvent.values[0]));
 
-                Log.i(TAG, "# of values:"+sensorEvent.values.length);
-                for(float value : sensorEvent.values)
-                {
-                    Log.i(TAG, "proximity: " + String.valueOf(value));
-                }
+                Log.i(TAG, "proximity: " + sensorEvent.values[0]);
 
                 plotProx();
 
-                if (gesturesButton.isChecked())
-                {
-                    long cur = sensorEvent.timestamp;
+                long cur = sensorEvent.timestamp;
 
-                    // Upside Down Logic
+                // Upside Down Logic
+                if (upDownGestureButton.isChecked()) {
                     if (orientationState) {
                         OrientationData ori = dao.getLastOrientation();
                         if ((cur - ori.timestamp) < 1E9) {
 
                             boolean newState;
 
-                            if (sensorEvent.values[0] == 0 && Math.abs(ori.y) >= 170 && Math.abs(ori.y) < 180) {
+                            if (sensorEvent.values[0] == 0 && (Math.abs(ori.y) > 170 && Math.abs(ori.y) <= 180) || Math.abs(ori.z) < 10) {
                                 Toast.makeText(getContext(), "UpSideDown", Toast.LENGTH_SHORT).show();
                                 Log.d(TAG, "UpSideDown");
                                 newState = false;
@@ -581,28 +573,29 @@ public class MainFragment extends Fragment {
                             restoreToggleUiState();
                         }
                     }
+                }
 
-                    // Wave Detection Logic
-                    else
-                    {
-                        List<ProximityData> last_three = dao.getProximityLast3();
-                        if (last_three.size() < 3)
-                            return;
+                // Wave Detection Logic
+                if(waveGestureButton.isChecked())
+                {
+                    List<ProximityData> last_three = dao.getProximityLast3();
+                    if (last_three.size() < 3)
+                        return;
 
-                        boolean check_time = true;
-                        for (ProximityData proxi : last_three) {
-                            check_time &= (cur - proxi.timestamp) < 2E9;
-                        }
-                        if (check_time && last_three.get(0).proximity > 0 && last_three.get(1).proximity == 0 && last_three.get(2).proximity > 0) {
-                            Toast.makeText(getContext(), "Wave Detected", Toast.LENGTH_SHORT).show();
+                    boolean check_time = true;
+                    for (ProximityData proxi : last_three) {
+                        check_time &= (cur - proxi.timestamp) < 2E9;
+                    }
+                    if (check_time && last_three.get(0).proximity > 0 && last_three.get(1).proximity == 0 && last_three.get(2).proximity > 0) {
+                        Toast.makeText(getContext(), "Wave Detected", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Wave Detected");
 
-                            accState = !accState;
-                            gyroState = !gyroState;
-                            lightState = !lightState;
-                            tempState = !tempState;
+                        accState = !accState;
+                        gyroState = !gyroState;
+                        lightState = !lightState;
+                        tempState = !tempState;
 
-                            restoreToggleUiState();
-                        }
+                        restoreToggleUiState();
                     }
                 }
             }
@@ -622,12 +615,8 @@ public class MainFragment extends Fragment {
             public void onSensorChanged(SensorEvent sensorEvent) {
 
                 dao.insertOrientation(new OrientationData(sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]));
+                Log.i(TAG, "orientation: " + Math.round(sensorEvent.values[0]) + " " + Math.round(sensorEvent.values[1]) + " " + Math.round(sensorEvent.values[2]));
 
-                Log.i(TAG, "# of values:"+sensorEvent.values.length);
-                for(float value : sensorEvent.values)
-                {
-                    Log.i(TAG, "orientation: " + String.valueOf(value));
-                }
             }
 
             @Override

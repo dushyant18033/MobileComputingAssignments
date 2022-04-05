@@ -22,13 +22,29 @@
                 android:gravity="center"
                 android:text="Location Services" />
 
-            <ToggleButton
-                android:id="@+id/toggleGestures"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:gravity="center"
-                android:textOn="Gestures Enabled"
-                android:textOff="Gestures Disabled" />
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/toggleGestureWave"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:textOn="Wave Gesture Enabled"
+                    android:textOff="Wave Gesture Disabled" />
+
+                <ToggleButton
+                    android:id="@+id/toggleGestureUpDown"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:textOn="UpDown Gesture Enabled"
+                    android:textOff="UpDown Gesture Disabled" />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
