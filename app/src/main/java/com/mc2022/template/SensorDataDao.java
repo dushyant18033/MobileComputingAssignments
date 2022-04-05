@@ -57,6 +57,9 @@ public interface SensorDataDao {
     @Query("SELECT * FROM OrientationData ORDER BY timestamp DESC LIMIT 10")
     List<OrientationData> getOrientation();
 
+    @Query("SELECT * FROM OrientationData ORDER BY timestamp DESC LIMIT 1")
+    OrientationData getLastOrientation();
+
     @Insert
     void insertOrientation(OrientationData orientationData);
 
@@ -89,6 +92,9 @@ public interface SensorDataDao {
 
     @Query("SELECT * FROM ProximityData ORDER BY timestamp DESC LIMIT 10")
     List<ProximityData> getProximity();
+
+    @Query("SELECT * FROM ProximityData ORDER BY timestamp DESC LIMIT 3")
+    List<ProximityData> getProximityLast3();
 
     @Insert
     void insertProximity(ProximityData... proximityData);

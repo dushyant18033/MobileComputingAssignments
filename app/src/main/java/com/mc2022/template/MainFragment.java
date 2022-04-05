@@ -81,6 +81,8 @@ public class MainFragment extends Fragment {
 
     private Button gpsButton;
 
+    private ToggleButton gesturesButton;
+
     private LineChart chartAcc;
     private LineChart chartProx;
 
@@ -145,6 +147,8 @@ public class MainFragment extends Fragment {
                         .commit();
             }
         });
+
+        gesturesButton = v.findViewById(R.id.toggleGestures);
 
         chartAcc = (LineChart) v.findViewById(R.id.chartAcc);
         chartProx = (LineChart) v.findViewById(R.id.chartProx);
@@ -506,7 +510,7 @@ public class MainFragment extends Fragment {
 
                 dao.insertLight(new LightData(sensorEvent.timestamp, sensorEvent.values[0]));
 
-                float threshold = 10.0f;
+                float threshold = 50.0f;
 
                 if (sensorEvent.values[0] <= threshold)
                 {
@@ -547,6 +551,60 @@ public class MainFragment extends Fragment {
                 }
 
                 plotProx();
+
+                if (gesturesButton.isChecked())
+                {
+                    long cur = sensorEvent.timestamp;
+
+                    // Upside Down Logic
+                    if (orientationState) {
+                        OrientationData ori = dao.getLastOrientation();
+                        if ((cur - ori.timestamp) < 1E9) {
+
+                            boolean newState;
+
+                            if (sensorEvent.values[0] == 0 && Math.abs(ori.y) >= 170 && Math.abs(ori.y) < 180) {
+                                Toast.makeText(getContext(), "UpSideDown", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, "UpSideDown");
+                                newState = false;
+                            } else {
+                                Toast.makeText(getContext(), "UpSideUp", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, "UpSideUp");
+                                newState = true;
+                            }
+
+                            accState = newState;
+                            gyroState = newState;
+                            lightState = newState;
+                            tempState = newState;
+
+                            restoreToggleUiState();
+                        }
+                    }
+
+                    // Wave Detection Logic
+                    else
+                    {
+                        List<ProximityData> last_three = dao.getProximityLast3();
+                        if (last_three.size() < 3)
+                            return;
+
+                        boolean check_time = true;
+                        for (ProximityData proxi : last_three) {
+                            check_time &= (cur - proxi.timestamp) < 2E9;
+                        }
+                        if (check_time && last_three.get(0).proximity > 0 && last_three.get(1).proximity == 0 && last_three.get(2).proximity > 0) {
+                            Toast.makeText(getContext(), "Wave Detected", Toast.LENGTH_SHORT).show();
+
+                            accState = !accState;
+                            gyroState = !gyroState;
+                            lightState = !lightState;
+                            tempState = !tempState;
+
+                            restoreToggleUiState();
+                        }
+                    }
+                }
             }
 
             @Override
