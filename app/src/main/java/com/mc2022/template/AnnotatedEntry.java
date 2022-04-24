@@ -19,7 +19,6 @@ public class AnnotatedEntry implements Serializable
         this.rssiInfo = rssiInfo;
     }
 
-    // TODO: Implement
     @RequiresApi(api = Build.VERSION_CODES.N)
     public double distRssi(HashMap<String, Integer> rssiInfoCur)
     {
