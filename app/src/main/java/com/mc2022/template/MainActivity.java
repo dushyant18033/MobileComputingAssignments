@@ -2,7 +2,6 @@ package com.mc2022.template;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,8 +14,6 @@ import androidx.fragment.app.FragmentManager;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
-    private WifiManager wifiManager;
 
     private String previousState = "";
 
@@ -35,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         if (fm.findFragmentById(R.id.main_fragment_container) == null) {
             fm.beginTransaction()
-                    .add(R.id.main_fragment_container, new WardriveFragment())
+                    .add(R.id.main_fragment_container, new MainFragment())
                     .commit();
         }
 

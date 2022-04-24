@@ -5,59 +5,82 @@
     android:layout_height="match_parent"
     tools:context=".WardriveFragment">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewPredLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Predicted Location"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editTextLocId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:gravity="center"
+            android:hint="Assign a Location Id"
+            android:inputType="textPersonName"
+            android:minHeight="48dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="4dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textViewPredLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text="Predicted Location"
-                android:textAlignment="center"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/editTextName"
-                android:layout_width="match_parent"
+                android:id="@+id/editTextLocX"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:hint="Assign a Location Id"
-                android:inputType="textPersonName"
+                android:hint="Set Location X"
+                android:inputType="numberDecimal"
                 android:minHeight="48dp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+            <EditText
+                android:id="@+id/editTextLocY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnAdd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:text="+ ADD" />
-
-                <Button
-                    android:id="@+id/btnPredict"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:text="PREDICT LOCATION" />
-            </LinearLayout>
+                android:hint="Set Location Y"
+                android:inputType="numberDecimal"
+                android:minHeight="48dp" />
         </LinearLayout>
-    </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="+ ADD" />
+
+            <Button
+                android:id="@+id/btnScan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="SCAN" />
+        </LinearLayout>
+    </LinearLayout>
 
 </FrameLayout>
