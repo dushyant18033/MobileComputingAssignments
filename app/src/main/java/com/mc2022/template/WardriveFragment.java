@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,8 +39,8 @@ public class WardriveFragment extends Fragment {
     private BroadcastReceiver wifiScanReceiver;
 
     private EditText editTextLocId;
-    private EditText editTextLocX;
-    private EditText editTextLocY;
+//    private EditText editTextLocX;
+//    private EditText editTextLocY;
     private Button btnAddLocation;
 
     private TextView textViewPredLocation;
@@ -70,10 +72,10 @@ public class WardriveFragment extends Fragment {
         }
 
 
-        Log.d(TAG, "init older annotations");
+        Log.i(TAG, "init older annotations");
         for (AnnotatedEntry entry:annotations)
         {
-            Log.d(TAG, entry.getUserAnnotation());
+            Log.i(TAG, entry.getUserAnnotation());
         }
 
 
@@ -83,9 +85,7 @@ public class WardriveFragment extends Fragment {
         wifiScanReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context c, Intent intent) {
-                Log.d(TAG, "WiFi scan results available");
-                boolean success = intent.getBooleanExtra(
-                        WifiManager.EXTRA_RESULTS_UPDATED, false);
+                boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED,false);
                 if (success) {
                     scanSuccess();
                 } else {
@@ -115,19 +115,19 @@ public class WardriveFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_wardrive, container, false);
 
         editTextLocId = v.findViewById(R.id.editTextLocId);
-        editTextLocX = v.findViewById(R.id.editTextLocX);
-        editTextLocY = v.findViewById(R.id.editTextLocY);
+//        editTextLocX = v.findViewById(R.id.editTextLocX);
+//        editTextLocY = v.findViewById(R.id.editTextLocY);
         btnAddLocation = v.findViewById(R.id.btnAdd);
 
         btnAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "btnAdd");
+                Log.i(TAG, "btnAdd");
 
                 saveNewAnnotation = true;
                 newLocId = editTextLocId.getText().toString();
-                newLocX = Float.parseFloat(editTextLocX.getText().toString());
-                newLocY = Float.parseFloat(editTextLocY.getText().toString());
+//                newLocX = Float.parseFloat(editTextLocX.getText().toString());
+//                newLocY = Float.parseFloat(editTextLocY.getText().toString());
 
                 boolean success = wifiManager.startScan();
                 if (!success) {
@@ -143,12 +143,15 @@ public class WardriveFragment extends Fragment {
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "btnPred");
+                Log.i(TAG, "btnScan");
 
                 boolean success = wifiManager.startScan();
                 if (!success) {
                     // scan failure handling
                     scanFailure();
+                }
+                else {
+                    Toast.makeText(getContext(), "scan successful", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -157,7 +160,21 @@ public class WardriveFragment extends Fragment {
     }
 
     private void scanSuccess() {
+        Log.i(TAG, "WiFi scan results available");
+        updateInformation();
+    }
+
+    private void scanFailure() {
+        Log.i(TAG, "old scan results, not using them!");
+//        updateInformation();
+    }
+
+    private void updateInformation() {
         List<ScanResult> results = wifiManager.getScanResults();
+
+        for (ScanResult result : results) {
+            Log.d(TAG, result.SSID);
+        }
 
         HashMap<String, Integer> rssiInfo = new HashMap<String, Integer>();
         for (ScanResult result : results)
@@ -166,31 +183,26 @@ public class WardriveFragment extends Fragment {
         }
 
 
-        // TODO: save logic --> (more testing needed)
+        // saving
         if (saveNewAnnotation)
         {
             saveNewAnnotation = false;
-            annotations.add(new AnnotatedEntry(newLocId, newLocX, newLocY, rssiInfo));
+            annotations.add(new AnnotatedEntry(newLocId, rssiInfo));
         }
 
+        // predicting
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            annotations.sort(new Comparator<AnnotatedEntry>()
+            {
+                @Override
+                public int compare(AnnotatedEntry t1, AnnotatedEntry t2) {
+                    return (int) (t1.distRssi(rssiInfo) - t2.distRssi(rssiInfo));
+                }
+            });
 
-        // TODO: predict logic --> (more testing needed, code remaining)
-        for (AnnotatedEntry entry : annotations)
-        {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                float metric = entry.matchRssi(rssiInfo); // metric ka kya karein, kaise karein???
+            for (AnnotatedEntry t : annotations) {
+                Log.d(TAG, t.getUserAnnotation() + ": " + t.distRssi(rssiInfo));
             }
-        }
-
-    }
-
-    private void scanFailure() {
-        Log.d(TAG, "old scan results available, but not using them for now!");
-
-        List<ScanResult> results = wifiManager.getScanResults();
-
-        for (ScanResult result : results) {
-            Log.d(TAG, result.SSID);
         }
     }
 
