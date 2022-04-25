@@ -21,10 +21,17 @@ public class PdrFragment extends Fragment {
 
     private SensorManager sensorManager;
 
-    private Sensor mAccSensor;
+    private Sensor mLinAccSensor;
     private Sensor mMagSensor;
-    private SensorEventListener mAccListener;
+    private Sensor mAccSensor;
+
+    private SensorEventListener mLinAccListener;
     private SensorEventListener mMagListener;
+    private SensorEventListener mAccListener;
+
+    private float[] magValues;
+    private float[] accValues;
+    private float[] orientation = new float[3];
 
     private int stepCtr = 0;
     private int step_state = 0;
@@ -71,16 +78,17 @@ public class PdrFragment extends Fragment {
 
     void initializeSensors()
     {
-        mAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mAccListener = new SensorEventListener() {
+        mLinAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        mLinAccListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
                 float x = sensorEvent.values[0];
                 float y = sensorEvent.values[1];
                 float z = sensorEvent.values[2];
                 double magnitude = Math.sqrt(x*x + y*y + z*z);
-                Log.d(TAG, "acc magnitude: " + magnitude);
+                Log.d(TAG, "linear acc magnitude: " + magnitude);
 
+                // step count
                 if (step_state == 0 && magnitude > 5)
                     step_state = 1;
 
@@ -93,6 +101,17 @@ public class PdrFragment extends Fragment {
                     step_state = 0;
 
                     textViewStepCount.setText("Steps: " + stepCtr);
+                }
+
+                // direction
+                if (magValues!=null && accValues!=null)
+                {
+                    float[] rotMatrix = new float[9];
+
+                    SensorManager.getRotationMatrix(rotMatrix, null, accValues, magValues);
+                    SensorManager.getOrientation(rotMatrix, orientation);
+
+                    textViewDirection.setText("Direction: " + (-orientation[0]*180/3.14159265));
                 }
             }
 
@@ -107,6 +126,23 @@ public class PdrFragment extends Fragment {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
                 Log.d(TAG, "mag: " + sensorEvent.values[0] + " " + sensorEvent.values[1] + " " + sensorEvent.values[2]);
+
+                magValues = sensorEvent.values;
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
+
+        mAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mAccListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                Log.d(TAG, "acc: " + sensorEvent.values[0] + " " + sensorEvent.values[1] + " " + sensorEvent.values[2]);
+
+                accValues = sensorEvent.values;
             }
 
             @Override
@@ -117,12 +153,14 @@ public class PdrFragment extends Fragment {
     }
 
     void registerSensors() {
-        sensorManager.registerListener(mAccListener, mAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(mLinAccListener, mLinAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(mMagListener, mMagSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(mAccListener, mAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     void unregisterSensors() {
-        sensorManager.unregisterListener(mAccListener);
+        sensorManager.unregisterListener(mLinAccListener);
         sensorManager.unregisterListener(mMagListener);
+        sensorManager.unregisterListener(mAccListener);
     }
 }
