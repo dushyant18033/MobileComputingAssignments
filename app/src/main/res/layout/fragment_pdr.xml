@@ -16,12 +16,19 @@
             android:layout_margin="4dp"
             android:orientation="vertical">
 
+            <com.github.mikephil.charting.charts.ScatterChart
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_margin="4dp" />
+
             <TextView
                 android:id="@+id/textViewStepCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="8dp"
+                android:ems="10"
                 android:gravity="center"
                 android:text="Step Count"
                 android:textAlignment="center"
@@ -34,6 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="8dp"
+                android:ems="10"
                 android:gravity="center"
                 android:text="Direction"
                 android:textAlignment="center"

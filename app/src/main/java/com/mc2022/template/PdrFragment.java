@@ -1,5 +1,7 @@
 package com.mc2022.template;
 
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,6 +17,14 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.ScatterData;
+import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
+import java.util.ArrayList;
 
 
 public class PdrFragment extends Fragment {
@@ -51,6 +61,9 @@ public class PdrFragment extends Fragment {
     private TextView textViewStatus;
     private Button btnSet;
 
+    private ArrayList<Entry> points = new ArrayList<Entry>();
+    private ScatterChart chart;
+
     public PdrFragment() {
         // Required empty public constructor
     }
@@ -60,6 +73,8 @@ public class PdrFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         sensorManager = (SensorManager) getActivity().getSystemService(getContext().SENSOR_SERVICE);
+        points.add(new Entry(0,0));
+
         initializeSensors();
         registerSensors();
     }
@@ -111,6 +126,9 @@ public class PdrFragment extends Fragment {
             }
         });
 
+        chart = v.findViewById(R.id.chart);
+        updatePathPlot();
+
         return v;
     }
 
@@ -124,6 +142,38 @@ public class PdrFragment extends Fragment {
     public void onResume() {
         super.onResume();
         registerSensors();
+    }
+
+    void updatePathPlot() {
+        chart.getDescription().setEnabled(false);
+
+        ScatterDataSet set1 = new ScatterDataSet(points, "travel path");
+        set1.setScatterShape(ScatterChart.ScatterShape.SQUARE);
+        set1.setColor(ColorTemplate.COLORFUL_COLORS[0]);
+        set1.setScatterShapeSize(8f);
+
+        ArrayList<IScatterDataSet> dataSets = new ArrayList<>();
+        dataSets.add(set1);
+
+        ScatterData data = new ScatterData(dataSets);
+        chart.setData(data);
+
+        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                chart.getXAxis().setTextColor(Color.WHITE);
+                chart.getAxisRight().setTextColor(Color.WHITE);
+                chart.getLegend().setTextColor(Color.WHITE);
+                data.setValueTextColor(Color.WHITE);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                chart.getXAxis().setTextColor(Color.BLACK);
+                chart.getAxisRight().setTextColor(Color.BLACK);
+                chart.getLegend().setTextColor(Color.BLACK);
+                data.setValueTextColor(Color.BLACK);
+                break;
+        }
+
+        chart.invalidate();
     }
 
     void initializeSensors()
@@ -151,6 +201,16 @@ public class PdrFragment extends Fragment {
                     step_state = 0;
 
                     textViewStepCount.setText("Steps: " + stepCtr);
+
+                    // plot
+                    double ang = -orientation[0];
+                    Entry prev = points.get(points.size() - 1);
+
+                    float x_new = (float) (stride * Math.cos(ang)) + prev.getX();
+                    float y_new = (float) (stride * Math.sin(ang)) + prev.getY();
+                    points.add(new Entry(x_new, y_new));
+
+                    updatePathPlot();
                 }
 
                 // direction
@@ -161,7 +221,8 @@ public class PdrFragment extends Fragment {
                     SensorManager.getRotationMatrix(rotMatrix, null, accValues, magValues);
                     SensorManager.getOrientation(rotMatrix, orientation);
 
-                    textViewDirection.setText("Direction: " + (-orientation[0]*180/3.14159265));
+                    double ang = (-orientation[0]*180/3.14159);
+                    textViewDirection.setText("Direction: " + Math.round(100.0*ang)/100.0);
                 }
             }
 
