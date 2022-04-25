@@ -35,6 +35,7 @@ public class WardriveFragment extends Fragment {
 
     private static final String TAG = "WarDriveFragment";
     private static final String FILE_NAME = "RSSI.txt";
+    private static final int K = 5;
 
     private WifiManager wifiManager;
     private BroadcastReceiver wifiScanReceiver;
@@ -189,8 +190,7 @@ public class WardriveFragment extends Fragment {
 
         // predicting
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Collections.sort(annotations, new Comparator<AnnotatedEntry>()
-            {
+            Collections.sort(annotations, new Comparator<AnnotatedEntry>() {
                 @Override
                 public int compare(AnnotatedEntry t1, AnnotatedEntry t2) {
                     return (int) (t1.distRssi(rssiInfo) - t2.distRssi(rssiInfo));
@@ -199,14 +199,35 @@ public class WardriveFragment extends Fragment {
 
             Log.i(TAG, "sorted annotations");
 
+            // sorting
             for (AnnotatedEntry t : annotations) {
                 Log.d(TAG, t.getUserAnnotation() + ": " + t.distRssi(rssiInfo));
             }
 
-            if (annotations.size() > 0) {
-                textViewPredLocation.setText(annotations.get(0).getUserAnnotation());
+            // counting repetitions for mode based KNN
+            HashMap<String, Integer> locId_count = new HashMap<String, Integer>();
+            String best_predict = "";
+            int best_count = 0;
+
+            String all_predict = "";
+
+            for (int i = 0; i < Math.min(annotations.size(), K); i++) {
+                String locId = annotations.get(i).getUserAnnotation();
+                int newCount = 1 + locId_count.getOrDefault(locId, 0);
+                locId_count.put(locId, newCount);
+
+                if (newCount > best_count) {
+                    best_count = newCount;
+                    best_predict = locId;
+                }
+
+                all_predict += locId + ";";
             }
-            // TODO: predict using first K(=5 or 7) after sorting
+
+            // set on UI
+            if (annotations.size() > 0) {
+                textViewPredLocation.setText(all_predict + "\r\n Voting-Based KNN --> " + best_predict);
+            }
         }
 
         Toast.makeText(getContext(), "Scan completed", Toast.LENGTH_SHORT).show();
