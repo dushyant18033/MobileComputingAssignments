@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -36,8 +38,18 @@ public class PdrFragment extends Fragment {
     private int stepCtr = 0;
     private int step_state = 0;
 
+    private float step_threshold = 4f;
+    private float height = 67f;
+    private float stride = 0.41f * height;
+
     private TextView textViewStepCount;
     private TextView textViewDirection;
+
+    private EditText editTextHeight;
+    private EditText editTextThresh;
+
+    private TextView textViewStatus;
+    private Button btnSet;
 
     public PdrFragment() {
         // Required empty public constructor
@@ -60,6 +72,44 @@ public class PdrFragment extends Fragment {
 
         textViewStepCount = v.findViewById(R.id.textViewStepCount);
         textViewDirection = v.findViewById(R.id.textViewDirection);
+
+        editTextHeight = v.findViewById(R.id.editTextHeight);
+        editTextThresh = v.findViewById(R.id.editTextThresh);
+
+        textViewStatus = v.findViewById(R.id.textViewStatus);
+        textViewStatus.setText(
+                "Height: " + height + " inches \r\n" +
+                "Stride: " + stride + " inches \r\n" +
+                "Step Thresh: " + step_threshold
+        );
+
+        btnSet = v.findViewById(R.id.btnSet);
+        btnSet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String heightStr = editTextHeight.getText().toString();
+                String stepThreshStr = editTextThresh.getText().toString();
+
+                if (!heightStr.isEmpty())
+                {
+                    height = Float.parseFloat(heightStr);
+                    stride = 0.41f * height;
+                    editTextHeight.setText("");
+                }
+
+                if (!stepThreshStr.isEmpty())
+                {
+                    step_threshold = Float.parseFloat(stepThreshStr);
+                    editTextThresh.setText("");
+                }
+
+                textViewStatus.setText(
+                        "Height: " + height + " inches \r\n" +
+                        "Stride: " + stride + " inches \r\n" +
+                        "Step Thresh: " + step_threshold
+                );
+            }
+        });
 
         return v;
     }
@@ -89,10 +139,10 @@ public class PdrFragment extends Fragment {
                 Log.d(TAG, "linear acc magnitude: " + magnitude);
 
                 // step count
-                if (step_state == 0 && magnitude > 5)
+                if (step_state == 0 && magnitude > step_threshold)
                     step_state = 1;
 
-                if (step_state == 1 && magnitude < 5)
+                if (step_state == 1 && magnitude < step_threshold)
                     step_state = 2;
 
                 if (step_state == 2)
