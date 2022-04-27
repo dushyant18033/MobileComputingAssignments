@@ -48,7 +48,7 @@ public class PdrFragment extends Fragment {
     private int stepCtr = 0;
     private int step_state = 0;
 
-    private float step_threshold = 4f;
+    private float step_threshold = 3.5f;
     private float height = 67f;
     private float stride = 0.41f * height;
 
