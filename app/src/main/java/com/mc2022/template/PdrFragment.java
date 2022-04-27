@@ -262,6 +262,13 @@ public class PdrFragment extends Fragment {
     void updatePathPlot() {
         chart.getDescription().setEnabled(false);
 
+        Collections.sort(points, new Comparator<Entry>() {
+            @Override
+            public int compare(Entry t1, Entry t2) {
+                return (int) (t1.getX() - t2.getX());
+            }
+        });
+
         ScatterDataSet set1 = new ScatterDataSet(points, "travel path");
         set1.setScatterShape(ScatterChart.ScatterShape.SQUARE);
         set1.setColor(ColorTemplate.COLORFUL_COLORS[0]);
