@@ -1,11 +1,13 @@
 package com.mc2022.template;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -24,25 +27,39 @@ import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 
 
 public class PdrFragment extends Fragment {
 
     private static final String TAG = "PDRFragment";
+    private static final String FILE_NAME = "PDR.txt";
+    private static final int K = 5;
 
     private SensorManager sensorManager;
 
     private Sensor mLinAccSensor;
     private Sensor mMagSensor;
     private Sensor mAccSensor;
+    private Sensor mLightSensor;
 
     private SensorEventListener mLinAccListener;
     private SensorEventListener mMagListener;
     private SensorEventListener mAccListener;
+    private SensorEventListener mLightListener;
 
     private float[] magValues;
     private float[] accValues;
+    private float[] lightValues;
     private float[] orientation = new float[3];
 
     private int stepCtr = 0;
@@ -61,6 +78,12 @@ public class PdrFragment extends Fragment {
     private TextView textViewStatus;
     private Button btnSet;
 
+    private List<SensorFingerprint> fingerprints = new ArrayList<SensorFingerprint>();
+    private TextView textViewPredLoc;
+    private EditText editTextLocId;
+    private Button btnAdd;
+    private Button btnUpdate;
+
     private ArrayList<Entry> points = new ArrayList<Entry>();
     private ScatterChart chart;
 
@@ -71,6 +94,22 @@ public class PdrFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // load previous data
+        try {
+            loadFingerprintsFromFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        Log.i(TAG, "init older fingerprint anchors");
+        for (SensorFingerprint entry:fingerprints)
+        {
+            Log.d(TAG, entry.getUserAnnotation());
+        }
 
         sensorManager = (SensorManager) getActivity().getSystemService(getContext().SENSOR_SERVICE);
         points.add(new Entry(0,0));
@@ -126,6 +165,72 @@ public class PdrFragment extends Fragment {
             }
         });
 
+        textViewPredLoc = v.findViewById(R.id.textViewPredLoc);
+        editTextLocId = v.findViewById(R.id.editTextLocId);
+
+        btnAdd = v.findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i(TAG, "btnAdd");
+
+                if(mAccSensor==null || mMagSensor==null || mLightSensor==null)
+                {
+                    Toast.makeText(getContext(), "Plz wait, sensors not ready!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String locId = editTextLocId.getText().toString();
+                fingerprints.add(new SensorFingerprint(locId, accValues, magValues, lightValues));
+                Toast.makeText(getContext(), "Saved: " + locId, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnUpdate = v.findViewById(R.id.btnUpdate);
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Collections.sort(fingerprints, new Comparator<SensorFingerprint>() {
+                        @Override
+                        public int compare(SensorFingerprint t1, SensorFingerprint t2) {
+                            return (int) (t1.distFingerprint(accValues, magValues, lightValues) - t2.distFingerprint(accValues, magValues, lightValues));
+                        }
+                    });
+                }
+                else {
+                    Toast.makeText(getContext(), "unsupported operation", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // counting repetitions for mode based KNN
+                HashMap<String, Integer> locId_count = new HashMap<String, Integer>();
+                String best_predict = "";
+                int best_count = 0;
+
+                String all_predict = "";
+
+                for (int i = 0; i < Math.min(fingerprints.size(), K); i++) {
+                    String locId = fingerprints.get(i).getUserAnnotation();
+                    int newCount = 1 + locId_count.getOrDefault(locId, 0);
+                    locId_count.put(locId, newCount);
+
+                    if (newCount > best_count) {
+                        best_count = newCount;
+                        best_predict = locId;
+                    }
+
+                    all_predict += locId + ";";
+                }
+
+                // set on UI
+                if (fingerprints.size() > 0) {
+                    textViewPredLoc.setText(all_predict + "\r\n Voting-Based KNN --> " + best_predict);
+                }
+
+            }
+        });
+
         chart = v.findViewById(R.id.chart);
         updatePathPlot();
 
@@ -142,6 +247,16 @@ public class PdrFragment extends Fragment {
     public void onResume() {
         super.onResume();
         registerSensors();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        try {
+            saveFingerprintsToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     void updatePathPlot() {
@@ -261,17 +376,53 @@ public class PdrFragment extends Fragment {
 
             }
         };
+
+        mLightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        mLightListener = new SensorEventListener() {
+
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                Log.d(TAG, "light: " + sensorEvent.values[0]);
+
+                lightValues = sensorEvent.values;
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
     }
 
     void registerSensors() {
         sensorManager.registerListener(mLinAccListener, mLinAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(mMagListener, mMagSensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(mAccListener, mAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(mLightListener, mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     void unregisterSensors() {
         sensorManager.unregisterListener(mLinAccListener);
         sensorManager.unregisterListener(mMagListener);
         sensorManager.unregisterListener(mAccListener);
+        sensorManager.unregisterListener(mLightListener);
+    }
+
+    public void saveFingerprintsToFile() throws IOException
+    {
+        FileOutputStream fos = getContext().openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(fingerprints);
+        os.close();
+        fos.close();
+    }
+
+    public void loadFingerprintsFromFile() throws IOException, ClassNotFoundException
+    {
+        FileInputStream fis = getContext().openFileInput(FILE_NAME);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        fingerprints = (List<SensorFingerprint>) is.readObject();
+        is.close();
+        fis.close();
     }
 }
